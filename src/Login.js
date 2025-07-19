@@ -1,41 +1,56 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-function Login({ onLogin }) {
-  const [voterId, setVoterId] = useState("");
+const Login = () => {
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const backendUrl = 'https://sovs-backend.onrender.com'; // ✅ Ensure this is your live backend
 
-    const res = await fetch("https://your-backend-url.onrender.com/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ voter_id: voterId })
-    });
+  const handleLogin = async () => {
+    if (!email) {
+      setError('Please enter your email');
+      return;
+    }
 
-    const data = await res.json();
+    try {
+      const response = await fetch(`${backendUrl}/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
 
-    if (data.success) {
-      onLogin(voterId);
-    } else {
-      alert("Login failed: " + data.message);
+      const data = await response.json();
+
+      if (data.success) {
+        localStorage.setItem('voterEmail', email);
+        navigate('/vote');
+      } else {
+        setError(data.message || 'Login failed');
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('Server error. Please try again later.');
     }
   };
 
   return (
-    <div style={{ padding: "2rem" }}>
+    <div style={{ padding: '30px', fontFamily: 'Arial' }}>
       <h2>🔐 Voter Login</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Enter your Voter ID"
-          value={voterId}
-          onChange={(e) => setVoterId(e.target.value)}
-          required
-        />
-        <button type="submit" style={{ marginLeft: "1rem" }}>Login</button>
-      </form>
+      <input
+        type="email"
+        placeholder="jane.mutua@example.com"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        style={{ padding: '8px', marginRight: '10px' }}
+      />
+      <button onClick={handleLogin}>Login</button>
+      {error && <p style={{ color: 'red', marginTop: '10px' }}>{error}</p>}
     </div>
   );
-}
+};
 
 export default Login;
