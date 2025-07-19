@@ -1,24 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 
 function Results() {
   const [results, setResults] = useState([]);
 
   useEffect(() => {
-    fetch("https://your-backend-url.onrender.com/results")
+    fetch('https://sovs-backend.onrender.com/results')
       .then(res => res.json())
       .then(data => setResults(data));
   }, []);
 
   return (
     <div>
-      <h2>📊 Election Results</h2>
-      {results.map(r => (
-        <div key={r.candidate}>
-          {r.candidate}: {r.votes} votes
-        </div>
-      ))}
+      <h2>Live Voting Results</h2>
+      <ul>
+        {results.map(result => (
+          <li key={result.candidate}>{result.candidate}: {result.votes} votes</li>
+        ))}
+      </ul>
     </div>
   );
 }
 
 export default Results;
+
